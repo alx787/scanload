@@ -1,1 +1,22 @@
-<h1>Hello !!!</h1>
+
+$webResourceManager.requireResourcesForContext("scanload")
+
+
+<button class="aui-button" id="button-refresh" onclick="scanload.module.refresh()">Обновить</button>
+<button class="aui-button" id="button-loadscreen" onclick="scanload.module.openloadscreen()">Загрузить</button>
+
+
+<table id="filesOnLocalSide" class="aui fixed_header">
+    <thead>
+        <tr>
+            <th id="basic-name">Имя</th>
+            <th id="basic-size">Размер</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td headers="basic-name">файл 1</td>
+            <td headers="basic-size">12121212121</td>
+        </tr>
+    </tbody>
+</table>

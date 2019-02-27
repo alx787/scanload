@@ -13,17 +13,21 @@
   <!-- add our web resources -->
   <web-resource key="scanload-resources" name="scanload Web Resources">
     <dependency>com.atlassian.auiplugin:ajs</dependency>
+    <dependency>com.atlassian.auiplugin:aui-button</dependency>
     <resource type="download" name="scanload.css" location="/css/scanload.css"/>
     <resource type="download" name="scanload.js" location="/js/scanload.js"/>
     <resource type="download" name="images/" location="/images"/>
     <context>scanload</context>
+    <context>jira.view.issue</context>
+    <context>jira.navigator.simple</context>
+    <context>jira.navigator.advanced</context>
   </web-resource>
   <web-panel name="FilesToLoad" i18n-name-key="files-to-load.name" key="files-to-load" location="atl.jira.view.issue.left.context" weight="500">
     <description key="files-to-load.description">The FilesToLoad Plugin</description>
     <!--<context-provider class="ru.hlynov.oit.panel.OnlyOfficeLinks"/>-->
-    <resource name="view" type="velocity" location="templates/local-scan-files.vm"/>
+    <resource type="velocity" name="view" location="templates/local-scan-files.vm"/>
     <label key="Файлы для загрузки"/>
-    <context>jira.view.issue</context>
+    <!--<context>jira.view.issue</context>-->
 
   </web-panel>
 </atlassian-plugin>
