@@ -1,4 +1,4 @@
-package ru.hlynov.oit.tools.api;
+package ru.hlynov.oit.scanload.tools.api;
 
 public interface MyPluginComponent
 {

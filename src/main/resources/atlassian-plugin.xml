@@ -28,6 +28,8 @@
     <resource type="velocity" name="view" location="templates/local-scan-files.vm"/>
     <label key="Файлы для загрузки"/>
     <!--<context>jira.view.issue</context>-->
-
   </web-panel>
+  <rest name="Explore Attach" i18n-name-key="explore-attach.name" key="explore-attach" path="/scanload" version="1.0">
+    <description key="explore-attach.description">The Explore Attach Plugin</description>
+  </rest>
 </atlassian-plugin>

@@ -42,10 +42,10 @@
             <scope>provided</scope>
         </dependency>
         <!--<dependency>-->
-            <!--<groupId>com.atlassian.plugin</groupId>-->
-            <!--<artifactId>atlassian-spring-scanner-runtime</artifactId>-->
-            <!--<version>${atlassian.spring.scanner.version}</version>-->
-            <!--<scope>runtime</scope>-->
+        <!--<groupId>com.atlassian.plugin</groupId>-->
+        <!--<artifactId>atlassian-spring-scanner-runtime</artifactId>-->
+        <!--<version>${atlassian.spring.scanner.version}</version>-->
+        <!--<scope>runtime</scope>-->
         <!--</dependency>-->
         <dependency>
             <groupId>javax.inject</groupId>
@@ -87,6 +87,36 @@
             <version>1.8.5</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.plugins.rest</groupId>
+            <artifactId>atlassian-rest-common</artifactId>
+            <version>1.0.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.sal</groupId>
+            <artifactId>sal-api</artifactId>
+            <version>2.6.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.wink</groupId>
+            <artifactId>wink-client</artifactId>
+            <version>1.1.3-incubating</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -96,6 +126,7 @@
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <skipTests>true</skipTests>
                     <productVersion>${jira.version}</productVersion>
                     <productDataVersion>${jira.version}</productDataVersion>
                     <!-- Uncomment to install TestKit backdoor in JIRA. -->
