@@ -2,23 +2,36 @@
 $webResourceManager.requireResourcesForContext("scanload")
 
 
-<button class="aui-button" id="button-refresh" onclick="scanload.module.refresh()">Обновить</button>
-<button class="aui-button" id="button-loadscreen" onclick="scanload.module.openloadscreen()">Загрузить отмеченные</button>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<button class="aui-button" id="button-loadfromscanner" onclick="scanload.module.openloadscreen()">Загрузить со сканера</button>
 
+<div style="width: 100%; margin: 10px 0 0 10px">
+    <button class="aui-button" id="button-refresh" onclick="scanload.module.refresh()">Обновить</button>
+    <button class="aui-button" id="button-loadscreen" onclick="scanload.module.loadselected()">Загрузить отмеченные</button>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <button class="aui-button" id="button-loadfromscanner" onclick="scanload.module.loadselected()">Загрузить со сканера</button>
+</div>
 
-<table id="filesOnLocalSide" class="aui fixed_header">
-    <thead>
-        <tr>
-            <th id="basic-name">Имя</th>
-            <th id="basic-size">Размер</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td headers="basic-name">файл 1</td>
-            <td headers="basic-size">12121212121</td>
-        </tr>
-    </tbody>
-</table>
+## заголовок таблицы
+<div style="width: 100%; font-weight: bold; margin: 20px 0 10px 10px">
+    Выберите файлы для загрузки
+</div>
+
+<div style="width: 100%; height: 300px; overflow-y: auto">
+    <table id="filesOnLocalSide" class="aui">
+    ##    <thead>
+    ##        <tr>
+    ##            <th class="column_1" id="basic-name">Имя</th>
+    ##            <th class="column_2" id="basic-size">Размер</th>
+    ##            <th class="column_3" id="basic-check"></th>
+    ##        </tr>
+    ##    </thead>
+        <tbody>
+##            <tr>
+##                <td class="column_1">файл 1</td>
+##                <td class="column_2">12121212121</td>
+##                <td class="column_3">
+##                    <input type="checkbox" checked>
+##                </td>
+##            </tr>
+        </tbody>
+    </table>
+</div>

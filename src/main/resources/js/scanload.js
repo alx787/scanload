@@ -4,8 +4,58 @@ scanload.module = [];
 
 scanload.module = (function () {
 
-    var rowTemplate = '<tr><td headers="basic-name">__name__</td><td headers="basic-size">__size__</td></tr>';
+    var rowTemplate = '<tr __style__>'
+        + '<td class="column_1">__name__</td>'
+        + '<td class="column_2">__size__</td>'
+        + '<td class="column_3"><input type="checkbox"></td>'
+        + '</tr>';
 
+    // + '<td class="column_3"><input type="checkbox" checked></td>'
+
+    // переменная для блокирования всех операций
+    var lockOperations = false;
+
+
+    ////////////////////////////////////////////
+    // получить текущие вложения задачи
+    ////////////////////////////////////////////
+    var issueAttachments = function(issueId) {
+
+        var responseObj = AJS.$.ajax({
+            url: AJS.params.baseURL + "/rest/api/2/issue/" + issueId,
+            type: 'get',
+            dataType: 'json',
+            async: false,
+        });
+
+        var attachs = [];
+
+        if (responseObj.statusText == "success") {
+            var jsonObj = JSON.parse(responseObj.responseText);
+
+            var attachsArr = jsonObj.fields.attachment;
+            var attachsArrLength = jsonObj.fields.attachment.length;
+
+            for (var i = 0; i < attachsArrLength; i++) {
+                arrElem = {};
+                arrElem.id = attachsArr[i].id;
+                arrElem.filename = attachsArr[i].filename;
+                arrElem.size = attachsArr[i].size;
+
+                attachs.push(arrElem);
+            }
+        }
+
+        // console.log("issue attachments");
+        // console.log(attachs);
+
+        return attachs;
+    }
+
+
+    ////////////////////////////////////////////
+    // заполнить таблицу файлов в папке загрузки
+    ////////////////////////////////////////////
     var refresh = function() {
 
         // console.log("============= refresh =============");
@@ -24,6 +74,7 @@ scanload.module = (function () {
             success: function(data) {
 
                 // console.log("============= refresh =============");
+
                 // var jsonText = "[{\"name\":\"rc_display.json\",\"size\":272},{\"name\":\"fernflower.jar\",\"size\":245371},{\"name\":\"\u041e\u0431\u0440\u0430\u0437\u0435\u0446 \u043f\u0438\u0441\u044c\u043c\u0430 \u0431\u0435\u0437 \u043b\u043e\u0433\u043e\u0442\u0438\u043f\u0430 (1).docx\",\"size\":22800},{\"name\":\"rc_asm.json\",\"size\":338},{\"name\":\"rclog.txt\",\"size\":894},{\"name\":\"\u041d\u0435\u043e\u0431\u0445\u043e\u0434\u0438\u043c\u044b\u0435+\u0441\u0430\u043c\u043e\u0441\u0442\u043e\u044f\u0442\u0435\u043b\u044c\u043d\u044b\u0435+\u0434\u043e\u0440\u0430\u0431\u043e\u0442\u043a\u0438 (1).doc\",\"size\":122135},{\"name\":\"rc_blocks.json\",\"size\":29},{\"name\":\"\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435\u041c\u043e\u0434\u0443\u043b\u0435\u0439\u0414\u0436\u0438\u0440\u044b.doc\",\"size\":23552},{\"name\":\"rc_cfr.json\",\"size\":1628}]"
                 // var jsonObj = JSON.parse(jsonText);
                 var jsonObj = data;
@@ -37,10 +88,40 @@ scanload.module = (function () {
                 // очистка таблицы
                 tableObj.empty();
 
+                // получим существующие вложения
+                var issueIdObj = AJS.$("a#key-val");
+                // массив с вложениями в формате JSON obj
+                var issueAttachsJson = [];
+
+                if (issueIdObj.length == 1) {
+                    issueAttachsJson = issueAttachments(issueIdObj.text());
+                }
+
+                // признак того что имя файла найдено во вложениях
+                var findInAttach = false;
+                var currAttachLength = issueAttachsJson.length;
+
                 for (var i = 0; i < json_size; i++) {
+
+                    //ищем среди текущих вложений
+                    findInAttach = false;
+                    for (var ii = 0; ii < currAttachLength; ii++) {
+                        if (jsonObj[i].name == issueAttachsJson[ii].filename) {
+                            findInAttach = true;
+                        }
+                    }
+
                     // заполняем значения строки
                     rowStr = rowTemplate.replace("__name__", jsonObj[i].name);
                     rowStr = rowStr.replace("__size__", jsonObj[i].size);
+
+
+                    // если вложение есть в задаче то установим красный цвет
+                    if (findInAttach) {
+                        rowStr = rowStr.replace("__style__", "style=\"color: #FF0000;\"");
+                    } else {
+                        rowStr = rowStr.replace("__style__", "");
+                    }
 
                     // добавляем строку
                     tableObj.append(rowStr);
@@ -55,14 +136,74 @@ scanload.module = (function () {
 
     }
 
-    var openloadscreen = function() {
+
+
+    ////////////////////////////////////////////
+    // загрузка отмеченных файлов
+    ////////////////////////////////////////////
+    var loadselected = function() {
         // alert(instr_1);
-        console.log("============= openloadscreenh =============");
+        console.log("============= loadselected =============");
+        //
+        // if (lockOperations) {
+        //     console.log(" lockOperations is true ");
+        //     lockOperations = false;
+        // } else {
+        //     console.log(" lockOperations is false ");
+        //     lockOperations = true;
+        // }
+
+        // таблица
+        var tableObj = AJS.$("table#filesOnLocalSide tbody tr");
+        var tableObjLength = tableObj.length;
+
+        var filesToLoad = [];
+
+        for (var i = 0; i < tableObjLength; i++) {
+
+            if (AJS.$(AJS.$(tableObj[i]).children()[2]).find("input[type='checkbox']").attr("checked") == "checked") {
+                filesToLoad.push(AJS.$(tableObj[i]).children()[0].innerText);
+            }
+        }
+
+
+        console.log(filesToLoad);
+        console.log(filesToLoad.length);
+
+        if (filesToLoad.length > 0) {
+
+            var jsonObj = {};
+            jsonObj.issueId = AJS.$("a#key-val").text();
+            jsonObj.filesToLoad = filesToLoad;
+
+
+            AJS.$.ajax({
+                url: AJS.params.baseURL + "/rest/exploreattach/1.0/scanload/getfile",
+                type: 'post',
+                dataType: 'json',
+                data: JSON.stringify(jsonObj),
+                async: true,
+                contentType: "application/json; charset=utf-8",
+                success: function(data) {
+
+
+                    // console.log(data);
+                    // user = data.username;
+                }
+            });
+
+        }
+
+
+
+
+
+
     }
 
     return {
         refresh:refresh,
-        openloadscreen:openloadscreen
+        loadselected:loadselected
     };
 }());
 
@@ -73,37 +214,11 @@ AJS.toInit(function() {
 
     // запуск обновления списка файлов
 
-    setInterval(function(){
-        if (AJS.$("table#filesOnLocalSide tbody").length != 0) {
-            scanload.module.refresh();
-        }
-    } , 5000);
-
-    // console.log("===================");
-    // console.log(AJS.$("#button-refresh"));
-    //
-    //
-    //
-    //
-    //
-    //
-    // AJS.$("#button-refresh").click(function () {
-    //     alert(123);
-    //
-    //     console.log("===================");
-    //     console.log("===================");
-    //     console.log("===================");
-    //
-    // });
-
-
-    // function callAlert1() {
-    //     alert(1111);
-    // }
-    //
-    // function callAlert2() {
-    //     alert(2222);
-    // }
+    // setInterval(function(){
+    //     if (AJS.$("table#filesOnLocalSide tbody").length != 0) {
+    //         scanload.module.refresh();
+    //     }
+    // } , 5000);
 
 });
 

@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonElement;
 
 import java.io.IOException;
 
@@ -36,7 +37,7 @@ public class ExploreAttach {
 //    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON})
     @Path("/getdirectorycontent")
-    public Response getMessage()
+    public Response getDirectoryContent()
     {
         Gson gson = new Gson();
 //        JsonArray jsonArray = new JsonArray();
@@ -109,13 +110,55 @@ public class ExploreAttach {
             jsonString = "[]";
         }
 
-//        if (jsonString == null) {
-//            log.warn(" ================== no get json");
-//        } else {
-//            log.warn(jsonString);
+        return Response.ok(jsonString).build();
+    }
+
+
+
+    @POST
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Path("/getfile")
+    public Response getFileFromDirectory(String inputJson)
+    {
+        log.warn("============= in ws ");
+
+        log.warn(inputJson);
+
+        Gson gson = new Gson();
+//        String [] fileNames = gson.fromJson(inputJson, String [].class);
+//
+//        for (String oneFileName : fileNames) {
+//            log.warn(oneFileName);
 //        }
 
-        return Response.ok(jsonString).build();
+//        JsonElement jelement = new JsonParser().parse(inputJson);
+//        JsonObject jobject = jelement.getAsJsonObject();
+
+        JsonObject jsonObject = new JsonParser().parse(inputJson).getAsJsonObject();
+
+        String issueId = jsonObject.get("issueId").getAsString();
+
+        log.warn(" ============== issue id");
+        log.warn(issueId);
+
+        JsonArray jarray = jsonObject.get("filesToLoad").getAsJsonArray();
+
+        log.warn(" ============== filenames");
+
+        for (JsonElement oneJsonObj : jarray) {
+
+//            log.warn(oneJsonObj.getAsJsonObject().getAsString());
+            log.warn(oneJsonObj.getAsString());
+
+        }
+
+//        jobject = jarray. get(0).getAsJsonObject();
+//        String result = jobject.get("translatedText").getAsString();
+
+        return Response.status(Response.Status.ACCEPTED).build();
 
     }
+
+
 }
