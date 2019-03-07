@@ -20,6 +20,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;
+import ru.hlynov.oit.scanload.tools.files.FileOps;
 
 import java.io.IOException;
 
@@ -125,6 +126,8 @@ public class ExploreAttach {
 
         log.warn(inputJson);
 
+        String filepath = null;
+
         Gson gson = new Gson();
 //        String [] fileNames = gson.fromJson(inputJson, String [].class);
 //
@@ -138,6 +141,7 @@ public class ExploreAttach {
         JsonObject jsonObject = new JsonParser().parse(inputJson).getAsJsonObject();
 
         String issueId = jsonObject.get("issueId").getAsString();
+        String username = jsonObject.get("username").getAsString();
 
         log.warn(" ============== issue id");
         log.warn(issueId);
@@ -146,17 +150,34 @@ public class ExploreAttach {
 
         log.warn(" ============== filenames");
 
+
+        String filename = null;
+
         for (JsonElement oneJsonObj : jarray) {
 
 //            log.warn(oneJsonObj.getAsJsonObject().getAsString());
             log.warn(oneJsonObj.getAsString());
+
+            filename = oneJsonObj.getAsString();
+
+            filepath = FileOps.getFileFromRemoteServer("http://localhost/api/getfile.php", filename);
+
+            if (FileOps.attachFileToIssue(issueId, username, oneJsonObj.getAsString(), filepath)) {
+
+            }
+
+            FileOps.deleteTempFile(filepath);
 
         }
 
 //        jobject = jarray. get(0).getAsJsonObject();
 //        String result = jobject.get("translatedText").getAsString();
 
-        return Response.status(Response.Status.ACCEPTED).build();
+
+        Gson gsonToStr = new Gson();
+        String jsonString = gsonToStr.toJson(jarray);
+
+        return Response.ok(jsonString).build();
 
     }
 

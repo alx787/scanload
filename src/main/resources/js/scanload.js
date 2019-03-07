@@ -7,7 +7,7 @@ scanload.module = (function () {
     var rowTemplate = '<tr __style__>'
         + '<td class="column_1">__name__</td>'
         + '<td class="column_2">__size__</td>'
-        + '<td class="column_3"><input type="checkbox"></td>'
+        + '<td class="column_3"><input type="checkbox" __checked__></td>'
         + '</tr>';
 
     // + '<td class="column_3"><input type="checkbox" checked></td>'
@@ -84,7 +84,27 @@ scanload.module = (function () {
                 var rowStr = "";
 
                 // таблица
+
+                var tableObjTr = AJS.$("table#filesOnLocalSide tbody tr");
+
+                var tableObjTrLength = tableObjTr.length;
+
+                // соберем строки которые отмечены галками
+                // чтоб сохранить галки при обновлении таблицы
+                var checkedRows = []; // массив строк - имена файлов которые были отмечены галками
+
+                for (var i = 0; i < tableObjTrLength; i++) {
+                    if (AJS.$(AJS.$(tableObjTr[i]).children()[2]).find("input[type='checkbox']").attr("checked") == "checked") {
+                        checkedRows.push(AJS.$(tableObjTr[i]).children()[0].innerText);
+                    }
+                }
+
+                console.log(" =========== сохраненнные строки ===========");
+                console.log(checkedRows);
+
+
                 var tableObj = AJS.$("table#filesOnLocalSide tbody");
+
                 // очистка таблицы
                 tableObj.empty();
 
@@ -99,6 +119,10 @@ scanload.module = (function () {
 
                 // признак того что имя файла найдено во вложениях
                 var findInAttach = false;
+                // признак того что имя файла было отмечено ранее перед обновлением
+                var findInChecked = false;
+
+
                 var currAttachLength = issueAttachsJson.length;
 
                 for (var i = 0; i < json_size; i++) {
@@ -108,6 +132,14 @@ scanload.module = (function () {
                     for (var ii = 0; ii < currAttachLength; ii++) {
                         if (jsonObj[i].name == issueAttachsJson[ii].filename) {
                             findInAttach = true;
+                        }
+                    }
+
+                    //ищем среди ранее отмеченных галками
+                    findInChecked = false;
+                    for (var ii = 0; ii < currAttachLength; ii++) {
+                        if (checkedRows.indexOf(jsonObj[i].name) != -1) {
+                            findInChecked = true;
                         }
                     }
 
@@ -122,6 +154,14 @@ scanload.module = (function () {
                     } else {
                         rowStr = rowStr.replace("__style__", "");
                     }
+
+                    // если был отмечен перед обновлением то отметим заново
+                    if (findInChecked) {
+                        rowStr = rowStr.replace("__checked__", "checked=\"checked\"");
+                    } else {
+                        rowStr = rowStr.replace("__checked__", "");
+                    }
+
 
                     // добавляем строку
                     tableObj.append(rowStr);
@@ -174,6 +214,7 @@ scanload.module = (function () {
 
             var jsonObj = {};
             jsonObj.issueId = AJS.$("a#key-val").text();
+            jsonObj.username = AJS.params.loggedInUser;
             jsonObj.filesToLoad = filesToLoad;
 
 
@@ -186,40 +227,69 @@ scanload.module = (function () {
                 contentType: "application/json; charset=utf-8",
                 success: function(data) {
 
+                    var dataLength = data.length;
+                    var strMess = "";
+
+                    for (var i = 0; i < dataLength; i++) {
+                        strMess = strMess + '<li>' + data[i] + '</li>';
+                    }
+
+                    strMess = '<ul>' + strMess +'</ul>';
+
+                    var myFlag = AJS.flag({
+                        title: "Загружены вложения",
+                        type: 'success',
+                        body: strMess,
+                    });
+
+                    console.log(data);
 
                     // console.log(data);
                     // user = data.username;
-                }
+                },
+                error: function(data) {
+                    var myFlag = AJS.flag({
+                        type: 'error',
+                        body: 'Ошибка загрузки',
+                    });
+
+                },
             });
 
         }
 
+    }
 
 
-
-
+    ////////////////////////////////////////////
+    // загрузка файлов со сканера
+    ////////////////////////////////////////////
+    var loadfromscanner = function () {
+        var myFlag = AJS.flag({
+            title: "Не реализовано",
+            type: 'success',
+            body: "Функционал в планах",
+        });
 
     }
 
     return {
         refresh:refresh,
-        loadselected:loadselected
+        loadselected:loadselected,
+        loadfromscanner:loadfromscanner
     };
 }());
 
 
 // AJS.$(function () {
 AJS.toInit(function() {
-
-
     // запуск обновления списка файлов
 
-    // setInterval(function(){
-    //     if (AJS.$("table#filesOnLocalSide tbody").length != 0) {
-    //         scanload.module.refresh();
-    //     }
-    // } , 5000);
-
+    setInterval(function(){
+        if (AJS.$("table#filesOnLocalSide tbody").length != 0) {
+            scanload.module.refresh();
+        }
+    } , 5000);
 });
 
 

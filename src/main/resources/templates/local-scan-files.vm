@@ -7,7 +7,7 @@ $webResourceManager.requireResourcesForContext("scanload")
     <button class="aui-button" id="button-refresh" onclick="scanload.module.refresh()">Обновить</button>
     <button class="aui-button" id="button-loadscreen" onclick="scanload.module.loadselected()">Загрузить отмеченные</button>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <button class="aui-button" id="button-loadfromscanner" onclick="scanload.module.loadselected()">Загрузить со сканера</button>
+    <button class="aui-button" id="button-loadfromscanner" onclick="scanload.module.loadfromscanner()">Загрузить со сканера</button>
 </div>
 
 ## заголовок таблицы
